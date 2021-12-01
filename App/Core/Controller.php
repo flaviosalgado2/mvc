@@ -11,4 +11,10 @@ class Controller
 
         return new $model;
     }
+
+    public function view($view, $data = [])
+    {
+        //(../) - volta um nivel de diretorio
+        require_once '../App/views/template.php';
+    }
 }
