@@ -8,8 +8,9 @@ if (!empty($data['mensagem'])) {
 }
 ?>
 
-<form action="/notes/criar" method="post">
+<form action="/notes/criar" method="post" enctype="multipart/form-data">
     Titulo: <input type="text" name="titulo"><br>
     Texto: <textarea name="texto" id="" cols="30" rows="10"></textarea><br>
+    Imagem: <br> <input type="file" name="foo" id="">
     <button name="cadastrar">Cadastrar</button>
 </form>

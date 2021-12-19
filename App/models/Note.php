@@ -80,4 +80,20 @@ class Note extends Model
             return "Erro ao atualizar";
         }
     }
+
+    public function search($search)
+    {
+        $sql = "SELECT * FROM notes WHERE titulo LIKE ? COLLATE utf8_general_ci";
+        $stmt = Model::getConn()->prepare($sql);
+        $stmt->bindValue(1, "%{$search}%");
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) :
+            $resultado = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        else :
+            return [];
+        endif;
+
+        return $resultado;
+    }
 }

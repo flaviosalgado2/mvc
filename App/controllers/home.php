@@ -5,11 +5,22 @@ use App\Auth;
 
 class Home extends Controller
 {
-    public function index($nome, $email)
+    public function index()
     {
         //se não existe nessa classe pega na classe herdada - metodo model
         $note = $this->model('Note');
         $dados = $note->getAll();
+
+        $this->view('home/index', $dados = ['registros' => $dados]);
+    }
+
+    public function buscar($id = '')
+    {
+        $busca = isset($_POST['search']) ? $_POST['search'] : $_SESSION['search'];
+        $_SESSION['search'] = $busca;
+
+        $note = $this->model('Note');
+        $dados = $note->search($busca);
 
         $this->view('home/index', $dados = ['registros' => $dados]);
     }
@@ -25,10 +36,15 @@ class Home extends Controller
             } else {
                 $email = $_POST['email'];
                 $senha = $_POST['senha'];
-                $mensagem[] = Auth::login($email, $senha);
+                $mensagem[] = Auth::Login($email, $senha);
             }
         }
 
         $this->view('home/login', $dados = ['mensagem' => $mensagem]);
+    }
+
+    public function logout()
+    {
+        Auth::Logout();
     }
 }
