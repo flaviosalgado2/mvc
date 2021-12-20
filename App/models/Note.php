@@ -7,6 +7,7 @@ class Note extends Model
 
     public $titulo;
     public $texto;
+    public $imagem;
 
     public function getAll()
     {
@@ -41,10 +42,11 @@ class Note extends Model
 
     public function save()
     {
-        $sql = "INSERT INTO notes (titulo, texto) VALUES (?, ?)";
+        $sql = "INSERT INTO notes (titulo, texto, imagem) VALUES (?, ?, ?)";
         $stmt = Model::getConn()->prepare($sql);
         $stmt->bindValue(1, $this->titulo);
         $stmt->bindValue(2, $this->texto);
+        $stmt->bindValue(3, $this->imagem);
 
         if ($stmt->execute()) {
             return "Cadastrado com sucesso!";
@@ -55,9 +57,35 @@ class Note extends Model
 
     public function delete($id)
     {
+        $resultado = $this->findId($id);
+
+        if (!empty($resultado['imagem'])) {
+            unlink("uploads/" . $resultado['imagem']);
+        }
+
         $sql = "DELETE FROM notes WHERE id = ?";
         $stmt = Model::getConn()->prepare($sql);
         $stmt->bindValue(1, $id);
+
+        if ($stmt->execute()) {
+            return "Excluido com sucesso!";
+        } else {
+            return "Erro ao excluir";
+        }
+    }
+
+    public function deleteImage($id)
+    {
+        $resultado = $this->findId($id);
+
+        if (!empty($resultado['imagem'])) {
+            unlink("uploads/" . $resultado['imagem']);
+        }
+
+        $sql = "UPDATE notes SET imagem = ? WHERE id = ?";
+        $stmt = Model::getConn()->prepare($sql);
+        $stmt->bindValue(1, "");
+        $stmt->bindValue(2, $id);
 
         if ($stmt->execute()) {
             return "Excluido com sucesso!";
@@ -78,6 +106,22 @@ class Note extends Model
             return "Atualizado com sucesso!";
         } else {
             return "Erro ao atualizar";
+        }
+    }
+
+    public function updateImagem($id)
+    {
+        $sql = "UPDATE notes SET imagem = ? WHERE id = ?";
+        $stmt = Model::getConn()->prepare($sql);
+        $stmt->bindValue(1, $this->imagem);
+        $stmt->bindValue(2, $id);
+
+        if ($stmt->execute()) {
+            //return "Imagem atualizada com sucesso!";
+            return "M.toast({html: 'Imagem atualizada com sucesso!', classes: 'rounded, green'});";
+        } else {
+            //return "Erro ao atualizar imagem";
+            return "M.toast({html: 'Erro ao atualizar imagem', classes: 'rounded, red'});";
         }
     }
 

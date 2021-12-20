@@ -23,10 +23,10 @@
         <div class="nav-wrapper container">
             <a href="#" class="brand-logo">MVC PHP</a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li><a href="/"> Bloco de Anotações</a> |</li>
+                <li><a href="/"> Bloco de Anotações</a> </li>
                 <?php if (isset($_SESSION['logado'])) { ?>
-                    <li><a href="/notes/criar">Criar Novo Bloco</a></li> |
-                    <li><a href="/users/cadastrar">Criar Usuários</a></li> |
+                    <li><a href="/notes/criar">Criar Novo Bloco</a></li>
+                    <li><a href="/users/cadastrar">Criar Usuários</a></li>
                 <?php } ?>
 
                 <?php if (!isset($_SESSION['logado'])) { ?>
@@ -40,6 +40,10 @@
     </nav>
 
     <?php require_once '../App/views/' . $view . '.php'; ?>
+
+    <script>
+        M.AutoInit();
+    </script>
 
 </body>
 

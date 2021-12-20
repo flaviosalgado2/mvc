@@ -39,7 +39,7 @@ class Notes extends Controller
                 // MimeType List => http://www.iana.org/assignments/media-types/media-types.xhtml
                 $file->addValidations(array(
                     // Ensure file is of type "image/png"
-                    new \Upload\Validation\Mimetype('application/pdf'),
+                    new \Upload\Validation\Mimetype('image/png'),
 
                     //You can also add multi mimetype validation
                     //new \Upload\Validation\Mimetype(array('image/png', 'image/gif'))
@@ -62,21 +62,19 @@ class Notes extends Controller
                 try {
                     // Success!
                     $file->upload();
-                    $mensagem[] = "Upload feito com sucesso!";
+                    //$mensagem[] = "Upload feito com sucesso!";
+
+                    $note = $this->model('Note');
+                    $note->titulo = $_POST['titulo'];
+                    $note->texto = $_POST['texto'];
+                    $note->imagem = $data['name'];
+
+                    $mensagem[] = $note->save();
                 } catch (\Exception $e) {
                     // Fail!
                     $errors = $file->getErrors();
                     $mensagem[] = implode("<br>", $errors);
                 }
-
-                $note = $this->model('Note');
-                $note->titulo = $_POST['titulo'];
-                $note->texto = $_POST['texto'];
-
-                //                var_dump($_POST);
-                //              die;
-
-                $mensagem[] = $note->save();
             }
         }
 
@@ -107,20 +105,67 @@ class Notes extends Controller
 
         if (isset($_POST['atualizar'])) {
 
-            if (empty($_POST['titulo'])) {
-                $mensagem[] = "O campo titulo não pode ser em branco";
-            } elseif (empty($_POST['texto'])) {
-                $mensagem[] = "O campo texto não está preenchido";
-            } else {
+            $note->titulo = $_POST['titulo'];
+            $note->texto = $_POST['texto'];
 
+            $mensagem[] = $note->update($id);
+        }
+
+        if (isset($_POST['atualizarImagem'])) {
+            //upload de arquivos
+            $storage = new \Upload\Storage\FileSystem('uploads');
+            $file = new \Upload\File('foo', $storage);
+
+            // Optionally you can rename the file on upload
+            $new_filename = uniqid();
+            $file->setName($new_filename);
+
+            // Validate file upload
+            // MimeType List => http://www.iana.org/assignments/media-types/media-types.xhtml
+            $file->addValidations(array(
+                // Ensure file is of type "image/png"
+                new \Upload\Validation\Mimetype('image/png'),
+
+                //You can also add multi mimetype validation
+                //new \Upload\Validation\Mimetype(array('image/png', 'image/gif'))
+
+                // Ensure file is no larger than 5M (use "B", "K", M", or "G")
+                new \Upload\Validation\Size('5M')
+            ));
+
+            // Access data about the file that has been uploaded
+            $data = array(
+                'name'       => $file->getNameWithExtension(),
+                'extension'  => $file->getExtension(),
+                'mime'       => $file->getMimetype(),
+                'size'       => $file->getSize(),
+                'md5'        => $file->getMd5(),
+                'dimensions' => $file->getDimensions()
+            );
+
+            // Try to upload file
+            try {
+                // Success!
+                $file->upload();
+                //$mensagem[] = "Upload feito com sucesso!";
+
+                $note = $this->model('Note');
                 $note->titulo = $_POST['titulo'];
                 $note->texto = $_POST['texto'];
+                $note->imagem = $data['name'];
 
-                //                var_dump($_POST);
-                //              die;
-
-                $mensagem[] = $note->update($id);
+                $mensagem[] = $note->updateImagem($id);
+            } catch (\Exception $e) {
+                // Fail!
+                $errors = $file->getErrors();
+                $mensagem[] = implode("<br>", $errors);
             }
+        }
+
+        if (isset($_POST['deletarImagem'])) {
+            $imagem = $note->findId($id);
+            unlink("uploads/" . $imagem['imagem']);
+            $mensagem[] = $note->deleteImage($id);
         }
 
         $dados = $note->findId($id);
