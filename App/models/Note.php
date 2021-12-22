@@ -11,7 +11,8 @@ class Note extends Model
 
     public function getAll()
     {
-        $sql = "SELECT * FROM notes";
+        $sql = "SELECT notes.id, notes.titulo, notes.texto, notes.imagem, users.nome 
+        FROM notes INNER JOIN users ON notes.id_user = users.id";
         $stmt = Model::getConn()->prepare($sql);
         $stmt->execute();
 
